@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.urls import path
 
-from . import views
+from routepang.views import LocalViews
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', LocalViews.home, name='home'),
+    path('getLocationList/<Nation_name>/', LocalViews.getLocationList, name='getLocation'),
 ]

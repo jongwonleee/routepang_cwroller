@@ -16,7 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from . import home_views
+
 urlpatterns = [
-    path('routepang/', include('routepang.urls')),
     path('admin/', admin.site.urls),
+    path('', home_views.index, name='index'),
+
+    path('local/', include('routepang.urls')),
 ]
