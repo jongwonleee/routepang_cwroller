@@ -19,5 +19,5 @@ from routepang.views import LocalViews
 
 urlpatterns = [
     path('', LocalViews.home, name='home'),
-    path('getLocationList/<Nation_name>/', LocalViews.getLocationList, name='getLocation'),
+    path('getLocation/<City_name>/', LocalViews.getLocation, name='getLocation'),
 ]

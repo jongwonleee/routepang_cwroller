@@ -1,14 +1,14 @@
 from django.http import HttpResponse
-from routepang.controller import LocalController
+from routepang.controller.LocalController import LocationController
 
 def home(reqult):
 
     return HttpResponse("local req")
 
-def getLocationList(request, Nation_name):
+def getLocation(request, City_name):
 
-    result = LocalController.getLocations(Nation_name)
-
-    # print(result)
+    result = LocationController.getLocationList(City_name)
+    LocationController.getLocationNameList(result)
+    LocationController.insertLocation(result)
 
     return HttpResponse("correct")
