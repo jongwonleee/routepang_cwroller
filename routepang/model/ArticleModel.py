@@ -8,3 +8,6 @@ class Article(models.Model):
     summary = models.CharField(max_length=255, null=True, blank=False)
     reg_date = models.DateTimeField(null=True, blank=False)
     user_id = models.IntegerField(blank=False)
+
+    def __str__(self):
+        return self.id

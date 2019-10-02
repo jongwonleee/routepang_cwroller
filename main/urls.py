@@ -22,5 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_views.index, name='index'),
 
-    path('local/', include('routepang.urls')),
+    path('parsing/', include('routepang.urls')),
 ]

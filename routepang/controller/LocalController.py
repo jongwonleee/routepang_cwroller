@@ -44,6 +44,9 @@ class LocationController:
             else:
                 time.sleep(2)
 
+        # for i in location_list:
+        #     print(i)
+
         return location_list
 
     # 인스크램 크롤링 목록
