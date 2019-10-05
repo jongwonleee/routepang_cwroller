@@ -22,5 +22,5 @@ urlpatterns = [
     path('location/getLocation/<City_name>/', LocalViews.getLocation, name='getLocation'),
 
     path('crawling/', CrawlingViews.home, name='home'),
-    path('crawling/getArticle/<tag>/', CrawlingViews.getArticle, name='getArticle'),
+    path('crawling/getArticle/<City_name>/', CrawlingViews.getArticle, name='getArticle'),
 ]
