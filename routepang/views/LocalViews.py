@@ -8,7 +8,6 @@ def home(reqult):
 def getLocation(request, City_name):
 
     result = LocationController.getLocationList(City_name)
-    LocationController.getLocationNameList(result)
-    # LocationController.insertLocation(result)
+    LocationController.insertLocation(result)
 
     return HttpResponse("correct")

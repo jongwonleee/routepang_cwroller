@@ -18,6 +18,7 @@ class LocationController:
 
         # next_page_token이 없을 때까지 넘어가면서 파싱
         while True:
+            # attraction / retaurant / cafe 정도로 category를 나눌 예정
             request_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + request + "+명소&key=" + google_api_key \
                   + "&pagetoken=" + next_page_token + "&language=ko"
 
@@ -62,26 +63,31 @@ class LocationController:
 
         return nameList
 
+    # json 배열을 request
+    # json형태의 데이터를 디비에 저장
     def insertLocation(request):
 
         for i in request:
-            place_id = i["place_id"]
-            address = i["formatted_address"]
             name = i["name"]
-            rating = i["rating"]
 
-            lon = i["geometry"]["location"]["lng"]
-            lat = i["geometry"]["location"]["lat"]
-            coordinates = GEOSGeometry('POINT(' + str(lon) + ' ' + str(lat) + ')')
+            # location_name으로 중복 검사
+            if (Location.objects.filter(name=name).exists() == False):
 
-            #category는 추후 개선
+                place_id = i["place_id"]
+                address = i["formatted_address"]
+                rating = i["rating"]
 
-            try:
-                image = i["photos"][0]["photo_reference"]
-            except KeyError:
-                image = "no image"
+                lon = i["geometry"]["location"]["lng"]
+                lat = i["geometry"]["location"]["lat"]
+                coordinates = GEOSGeometry('POINT(' + str(lon) + ' ' + str(lat) + ')')
 
-            Location(place_id=place_id, address=address, name=name, coordinates=coordinates, rating=rating,
-                     image=image).save()
+                #category는 추후 개선
+
+                try:
+                    image = i["photos"][0]["photo_reference"]
+                except KeyError:
+                    image = "no image"
+
+                Location(place_id=place_id, address=address, name=name, coordinates=coordinates, rating=rating, image=image).save()
 
         return
