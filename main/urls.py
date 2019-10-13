@@ -16,11 +16,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from . import home_views
+from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+from routepang.controller import JobController
+
+
+scheduler = BackgroundScheduler()
+
+# scheduler.add_job(JobController.locationTask(), 'interval', seconds=3, id="job_location")
+# scheduler.add_job(JobController.urlTask(), 'interval', seconds=3, id="job_url")
+# scheduler.add_job(JobController.infoTask(), 'interval', seconds=3, id="job_info")
+
+scheduler.start()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home_views.index, name='index'),
-
-    path('parsing/', include('routepang.urls')),
 ]
+
+
+
+

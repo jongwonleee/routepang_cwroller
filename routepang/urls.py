@@ -15,12 +15,5 @@ Including another URLconf
 """
 from django.urls import path
 
-from routepang.views import LocalViews, CrawlingViews
-
 urlpatterns = [
-    path('location/', LocalViews.home, name='home'),
-    path('location/getLocation/<City_name>/', LocalViews.getLocation, name='getLocation'),
-
-    path('crawling/', CrawlingViews.home, name='home'),
-    path('crawling/getArticle/<City_name>/', CrawlingViews.getArticle, name='getArticle'),
 ]

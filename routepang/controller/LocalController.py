@@ -6,53 +6,61 @@ from bs4 import BeautifulSoup
 from django.contrib.gis.geos import GEOSGeometry
 from routepang.model.LocationModel import Location
 
-# request에 해당하는 명소
+# request에 해당하는 명소(영어명)
 # 최대 60개까지 가져옴
 # json배열 형태로 return
 class LocationController:
-    def getLocationList(request):
 
-        google_api_key = "AIzaSyDsID62DKc24X5B-PpM1daGvv_qGBEJuYU"
-        next_page_token = ""
-        location_list = []
+    def __init__(self):
+        self.google_api_key = "AIzaSyDsID62DKc24X5B-PpM1daGvv_qGBEJuYU"
+        self.category = ["attraction", "food", "cafe"]
 
-        # next_page_token이 없을 때까지 넘어가면서 파싱
-        while True:
-            # attraction / retaurant / cafe 정도로 category를 나눌 예정
-            request_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + request + "+명소&key=" + google_api_key \
-                  + "&pagetoken=" + next_page_token + "&language=ko"
+    def getLocationList(self, request):
 
-            req = requests.get(request_url)
-            html = req.text
-            soup = BeautifulSoup(html, 'html.parser')
+        for i in range(3):
+            location_list = []
+            next_page_token = ""
 
-            # json 형태로 데이터 정제
-            json_data = json.loads(str(soup))
-            json_loaction_result = json_data["results"]
+            # next_page_token이 없을 때까지 넘어가면서 파싱
+            while True:
+                # attraction / food / cafe 정도로 category를 나눌 예정
+                request_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + request + "+" + \
+                              self.category[i] + "&key=" + self.google_api_key + "&pagetoken=" + next_page_token + \
+                              "&language=ko"
 
-            location_list = location_list + json_loaction_result
+                req = requests.get(request_url)
+                html = req.text
+                soup = BeautifulSoup(html, 'html.parser')
 
-            try:
-                next_page_token = json_data["next_page_token"]
-                # 마지막 페이지에서는
-                # next_page_token 키가 없기 때문에
-                # 키에러가 발생
-            except KeyError:
-                next_page_token = "END"
+                # json 형태로 데이터 정제
+                json_data = json.loads(str(soup))
+                json_loaction_result = json_data["results"]
 
-            if next_page_token == "END":
-                break
-            else:
-                time.sleep(2)
+                location_list = location_list + json_loaction_result
 
-        # for i in location_list:
-        #     print(i)
+                try:
+                    next_page_token = json_data["next_page_token"]
+                    # 마지막 페이지에서는
+                    # next_page_token 키가 없기 때문에
+                    # 키에러가 발생
+                except KeyError:
+                    next_page_token = "END"
 
-        return location_list
+                if next_page_token == "END":
+                    break
+                else:
+                    time.sleep(2)
+
+            LocationController.insertLocation(location_list, i+1)
+
+            # for i in location_list:
+            #     print(i)
+
+        return
 
     # 인스크램 크롤링 목록
     # 태그 검색을 위해 공백 X
-    def getLocationNameList(request):
+    def getLocationNameList(self, request):
 
         nameList = []
 
@@ -65,17 +73,16 @@ class LocationController:
 
     # json 배열을 request
     # json형태의 데이터를 디비에 저장
-    def insertLocation(request):
+    def insertLocation(self, request, category):
 
         for i in request:
             name = i["name"]
 
             # location_name으로 중복 검사
-            if (Location.objects.filter(name=name).exists() == False):
+            if not Location.objects.filter(name=name).exists():
 
                 place_id = i["place_id"]
                 address = i["formatted_address"]
-                rating = i["rating"]
 
                 lon = i["geometry"]["location"]["lng"]
                 lat = i["geometry"]["location"]["lat"]
@@ -88,6 +95,7 @@ class LocationController:
                 except KeyError:
                     image = "no image"
 
-                Location(place_id=place_id, address=address, name=name, coordinates=coordinates, rating=rating, image=image).save()
+                Location(place_id=place_id, address=address, name=name, coordinates=coordinates,
+                         image=image, category=category).save()
 
         return
