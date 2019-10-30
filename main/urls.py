@@ -16,21 +16,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from routepang.controller import JobController
 
+# scheduler = BackgroundScheduler()
 
-scheduler = BackgroundScheduler()
+# test용 time
+# scheduler.add_job(JobController.urlTask, 'cron', hour=23, minute=5, id="job_url")
+# scheduler.add_job(JobController.infoTask, 'cron', hour=23, minute=7, id="job_info")
 
-# scheduler.add_job(JobController.locationTask(), 'interval', seconds=3, id="job_location")
-# scheduler.add_job(JobController.urlTask(), 'interval', seconds=3, id="job_url")
-# scheduler.add_job(JobController.infoTask(), 'interval', seconds=3, id="job_info")
-
-scheduler.start()
+# scheduler.start()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('test1/', JobController.urlTask(), name='job1'),
+    # path('test2/', JobController.infoTask(), name='job2'),
 ]
 
 

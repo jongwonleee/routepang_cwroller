@@ -51,7 +51,7 @@ class LocationController:
                 else:
                     time.sleep(2)
 
-            LocationController.insertLocation(location_list, i+1)
+            self.insertLocation(request=location_list, category=i+1)
 
             # for i in location_list:
             #     print(i)
