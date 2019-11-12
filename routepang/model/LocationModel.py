@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.gis.db import models as models_gis
 
 class Location(models.Model):
+    class Meta:
+        db_table = "location"
+
     location_id = models.BigAutoField(primary_key=True, blank=False)
     place_id = models.CharField(max_length=255, blank=False)
     address = models.CharField(max_length=255, blank=False)

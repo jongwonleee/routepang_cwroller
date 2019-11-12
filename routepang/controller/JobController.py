@@ -7,18 +7,17 @@ from routepang.model.LocationModel import Location
 from routepang.model.UrlModel import Url
 
 from datetime import datetime
-from time import time
+import time
 
 def urlTask():
 
     print("Crawling start at: " + str(datetime.now()))
 
     # -------- ( Add Location ) -------- #
-    # TODO 테스트용 주석
-    # location_controller = LocationController()
-    # # 추후 도시 추가
-    # # Country + City
-    # location_controller.getLocationList(request="프랑스+파리")
+    location_controller = LocationController()
+    # 추후 도시 추가
+    # Country + City
+    location_controller.getLocationList(request="프랑스+파리")
 
     # -------- ( Add Url ) -------- #
 
@@ -32,7 +31,16 @@ def urlTask():
         # 해당 location에 해당하는 게시물들중, 현재 날짜를 기준으로 오래된 게시물들 삭제 (보류)
 
         place = str(location.name)
-        urlList = crawling_controller.getAllArticle(request=place)
+        urlData = crawling_controller.getAllArticle(request=place)
+
+        # 10개 이하의 데이터만 가져와서 저장
+        urlList = []
+        data_length = 10
+        if len(urlData) < 10:
+            data_length = data_length
+
+        for i in range(data_length):
+            urlList.append(urlData[i])
 
         for url in urlList:
             url_controller.insertUrl(request=url, location_id=location.location_id)
@@ -63,6 +71,7 @@ def infoTask():
             # 새로운 url만큼 urlList에 추가
             for new_url in current_urlList[len(urlList):current_urlList.count()]:
                 urlList.append(new_url)
+        time.sleep(2)
 
     del article_controller
 

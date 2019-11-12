@@ -19,17 +19,17 @@ from django.urls import include, path
 from apscheduler.schedulers.background import BackgroundScheduler
 from routepang.controller import JobController
 
-# scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler()
 
 # test용 time
-# scheduler.add_job(JobController.urlTask, 'cron', hour=23, minute=5, id="job_url")
-# scheduler.add_job(JobController.infoTask, 'cron', hour=23, minute=7, id="job_info")
+scheduler.add_job(JobController.urlTask, 'cron', hour=22, minute=51, id="job_url")
+scheduler.add_job(JobController.infoTask, 'cron', hour=23, minute=5, id="job_info")
 
-# scheduler.start()
+scheduler.start()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('test1/', JobController.urlTask(), name='job1'),
+    # path('test1/', JobController.urlTask(), name='job1'),
     # path('test2/', JobController.infoTask(), name='job2'),
 ]
 

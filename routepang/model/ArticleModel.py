@@ -1,6 +1,9 @@
 from django.db import models
 
 class Article(models.Model):
+    class Meta:
+        db_table = "crawling_article"
+
     article_id = models.BigAutoField(blank=False, primary_key=True)
     location_id = models.BigIntegerField(blank=False)
 
