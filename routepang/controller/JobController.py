@@ -3,8 +3,8 @@ from routepang.controller.CrawlingController import CrawlingController
 from routepang.controller.UrlController import UrlController
 from routepang.controller.ArticleController import ArticleController
 
-from routepang.model.LocationModel import Location
-from routepang.model.UrlModel import Url
+from routepang.model.Location import Location
+from routepang.model.Url import Url
 
 from datetime import datetime
 import time
@@ -31,19 +31,12 @@ def urlTask():
         # 해당 location에 해당하는 게시물들중, 현재 날짜를 기준으로 오래된 게시물들 삭제 (보류)
 
         place = str(location.name)
-        urlData = crawling_controller.getAllArticle(request=place)
+        urlList = crawling_controller.getAllArticle(request=place)
 
         # 10개 이하의 데이터만 가져와서 저장
-        urlList = []
-        data_length = 10
-        if len(urlData) < 10:
-            data_length = data_length
-
-        for i in range(data_length):
-            urlList.append(urlData[i])
 
         for url in urlList:
-            url_controller.insertUrl(request=url, location_id=location.location_id)
+            url_controller.insertUrl(request=url, location_id=location.id)
 
     del crawling_controller
     # del location_controller
@@ -71,7 +64,7 @@ def infoTask():
             # 새로운 url만큼 urlList에 추가
             for new_url in current_urlList[len(urlList):current_urlList.count()]:
                 urlList.append(new_url)
-        time.sleep(2)
+        # time.sleep(1)
 
     del article_controller
 

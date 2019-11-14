@@ -2,7 +2,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
-from routepang.model.ArticleModel import Article
+from routepang.model.Link import Link
 
 class CrawlingController:
 
@@ -26,7 +26,7 @@ class CrawlingController:
         self.driver.implicitly_wait(10)
         self.driver.find_element_by_xpath("/html/body/div[3]/div/div/div[3]/button[2]").click()
 
-        # 페이지가 인스타 그램인지 확인
+        # 페이지가 인스타그램인지 확인
         assert "Instagram" in self.driver.title
 
     def __del__(self):
@@ -119,14 +119,18 @@ class CrawlingController:
 
         print(time.time(), 'elapsed time:', time.time() - t)
 
-        return url_list
+        # url_list중에서 앞에 10개만 return
+        if len(url_list) > 5:
+            return url_list[:5]
+        else:
+            return url_list
 
     def getArticleUrl(self, link_url):
         url_list = []
 
         for i in link_url:
             # DB에 들어있는 article data 중복 확인
-            if not Article.objects.filter(url=i).exists():
+            if not Link.objects.filter(link_url=i).exists():
                 url_list.append(i.get_attribute('href'))
             # TODO 사진 카테고리 확인해서 목적에 맞지 않는 게시물인 경우
         # 중복 url 제거

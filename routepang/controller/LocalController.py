@@ -2,9 +2,10 @@ import requests
 import json
 import time
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 from django.contrib.gis.geos import GEOSGeometry
-from routepang.model.LocationModel import Location
+from routepang.model.Location import Location
 
 # request에 해당하는 명소(영어명)
 # 최대 60개까지 가져옴
@@ -13,8 +14,11 @@ class LocationController:
 
     def __init__(self):
         self.google_api_key = "AIzaSyDsID62DKc24X5B-PpM1daGvv_qGBEJuYU"
-        self.category = ["attraction", "food", "cafe"]
+        # TODO 카테고리 분류 추가
+        self.category = ["attraction", "food", "museum", "grocery", "subway_station", "church", "hospital", "police"
+                         , "lodging", "movie_theater", "bank", "spa"]
 
+    # TODO 카테고리 별로 페이지 넘기고 한 페이지 씩만 데이터 추가
     def getLocationList(self, request):
 
         for i in range(3):
@@ -94,8 +98,6 @@ class LocationController:
                 lat = i["geometry"]["location"]["lat"]
                 coordinates = GEOSGeometry('POINT(' + str(lon) + ' ' + str(lat) + ')')
 
-                #category는 추후 개선
-
                 try:
                     image = i["photos"][0]["photo_reference"]
                 except KeyError:
@@ -103,5 +105,10 @@ class LocationController:
 
                 Location(place_id=place_id, address=address, name=name, coordinates=coordinates,
                          image=image, category=category).save()
+            else:
+                # 기존의 location은 update_date를 now로 업데이트
+                existedLocation = Location.objects.get(name=name)
+                existedLocation.update_date = str(datetime.now())[:19]
+                existedLocation.save()
 
         return
