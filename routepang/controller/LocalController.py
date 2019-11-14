@@ -6,6 +6,7 @@ from datetime import datetime
 
 from django.contrib.gis.geos import GEOSGeometry
 from routepang.model.Location import Location
+from routepang.category.LocationCategory import LocationCategory
 
 # request에 해당하는 명소(영어명)
 # 최대 60개까지 가져옴
@@ -14,57 +15,43 @@ class LocationController:
 
     def __init__(self):
         self.google_api_key = "AIzaSyDsID62DKc24X5B-PpM1daGvv_qGBEJuYU"
-        # TODO 카테고리 분류 추가
-        self.category = ["attraction", "food", "museum", "grocery", "subway_station", "church", "hospital", "police"
-                         , "lodging", "movie_theater", "bank", "spa"]
+        self.category = ["attraction", "food", "museum", "grocery", "subwaystation", "church", "hospital", "police"
+                         , "lodging", "theater", "bank", "spa"]
 
-    # TODO 카테고리 별로 페이지 넘기고 한 페이지 씩만 데이터 추가
+    # TODO 카테고리 별로 페이지 넘기지 않 한 페이지 씩만 데이터 추가
     def getLocationList(self, request):
 
-        for i in range(3):
+        for category in self.category:
             location_list = []
-            next_page_token = ""
 
-            # next_page_token이 없을 때까지 넘어가면서 파싱
-            while True:
-                # attraction / food / cafe 정도로 category를 나눌 예정
-                request_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + request + "+" + \
-                              self.category[i] + "&key=" + self.google_api_key + "&pagetoken=" + next_page_token + \
-                              "&language=ko"
+            # attraction / food / cafe 정도로 category를 나눌 예정
+            request_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + request + "+" + \
+                            category + "&key=" + self.google_api_key + "&language=ko"
 
-                req = requests.get(request_url)
-                html = req.text
-                soup = BeautifulSoup(html, 'html.parser')
+            req = requests.get(request_url)
+            html = req.text
+            soup = BeautifulSoup(html, 'html.parser')
 
-                # json 형태로 데이터 정제
-                json_data = json.loads(str(soup))
-                json_loaction_result = json_data["results"]
+            # json 형태로 데이터 정제
+            json_data = json.loads(str(soup))
+            json_loaction_result = json_data["results"]
 
-                location_list = location_list + json_loaction_result
+            location_list = location_list + json_loaction_result
 
-                try:
-                    next_page_token = json_data["next_page_token"]
-                    # 마지막 페이지에서는
-                    # next_page_token 키가 없기 때문에
-                    # 키에러가 발생
-                except KeyError:
-                    next_page_token = "END"
+            # try:
+            #     next_page_token = json_data["next_page_token"]
+            #     # 마지막 페이지에서는
+            #     # next_page_token 키가 없기 때문에
+            #     # 키에러가 발생
+            # except KeyError:
+            #     next_page_token = "END"
+            #
+            # if next_page_token == "END":
+            #     break
+            # else:
+            #         time.sleep(2)
 
-                if next_page_token == "END":
-                    break
-                else:
-                    time.sleep(2)
-
-            category_number = 0
-            if i == 2:
-                category_number = i
-            else:
-                category_number = i+1
-
-            self.insertLocation(request=location_list, category=category_number)
-
-            # for i in location_list:
-            #     print(i)
+            self.insertLocation(request=location_list)
 
         return
 
@@ -83,7 +70,7 @@ class LocationController:
 
     # json 배열을 request
     # json형태의 데이터를 디비에 저장
-    def insertLocation(self, request, category):
+    def insertLocation(self, request):
 
         for i in request:
             name = i["name"]
@@ -93,6 +80,7 @@ class LocationController:
 
                 place_id = i["place_id"]
                 address = i["formatted_address"]
+                category = i["types"][0]
 
                 lon = i["geometry"]["location"]["lng"]
                 lat = i["geometry"]["location"]["lat"]
@@ -103,8 +91,11 @@ class LocationController:
                 except KeyError:
                     image = "no image"
 
+                # 카테고리 인스턴스 생성
+                c = LocationCategory()
+                # TODO 카테고리에 알맞은 category_number값 추가
                 Location(place_id=place_id, address=address, name=name, coordinates=coordinates,
-                         image=image, category=category).save()
+                         image=image, category=c.category(category)).save()
             else:
                 # 기존의 location은 update_date를 now로 업데이트
                 existedLocation = Location.objects.get(name=name)
