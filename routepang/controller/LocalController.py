@@ -1,12 +1,12 @@
 import requests
 import json
-import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 
 from django.contrib.gis.geos import GEOSGeometry
 from routepang.model.Location import Location
 from routepang.category.LocationCategory import LocationCategory
+from routepang.personal import personal
 
 # request에 해당하는 명소(영어명)
 # 최대 60개까지 가져옴
@@ -14,7 +14,7 @@ from routepang.category.LocationCategory import LocationCategory
 class LocationController:
 
     def __init__(self):
-        self.google_api_key = "AIzaSyDsID62DKc24X5B-PpM1daGvv_qGBEJuYU"
+        self.google_api_key = personal.mapKey
         self.category = ["attraction", "food", "museum", "grocery", "subwaystation", "church", "hospital", "police"
                          , "lodging", "theater", "bank", "spa"]
 
@@ -56,7 +56,6 @@ class LocationController:
         return
 
     # 인스크램 크롤링 목록
-    # 태그 검색을 위해 공백 X
     def getLocationNameList(self, request):
 
         nameList = []
@@ -80,7 +79,7 @@ class LocationController:
 
                 place_id = i["place_id"]
                 address = i["formatted_address"]
-                category = i["types"][0]
+                types = i["types"]
 
                 lon = i["geometry"]["location"]["lng"]
                 lat = i["geometry"]["location"]["lat"]
@@ -91,11 +90,25 @@ class LocationController:
                 except KeyError:
                     image = "no image"
 
-                # 카테고리 인스턴스 생성
+                # 카테고리 해시맵 인스턴스
                 c = LocationCategory()
+                # 카테고리 넘버
+                category = 0
+                for type in types:
+                    try:
+                        category = c.getCategoryNo(type)
+                        break
+                    # 메인 카테고리에 속하지 않으면 0(UNKNOWN) 처리
+                    except KeyError:
+                        category = 0
+
+                # print(name, "->", types, "->", category)
+
+                # 카테고리 인스턴스 생성
                 # TODO 카테고리에 알맞은 category_number값 추가
                 Location(place_id=place_id, address=address, name=name, coordinates=coordinates,
-                         image=image, category=c.category(category)).save()
+                         image=image, category=category, reg_date=str(datetime.now())[:19],
+                         update_date=str(datetime.now())[:19]).save()
             else:
                 # 기존의 location은 update_date를 now로 업데이트
                 existedLocation = Location.objects.get(name=name)

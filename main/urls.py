@@ -21,9 +21,12 @@ from routepang.controller import JobController
 
 scheduler = BackgroundScheduler()
 
+# 2개의 job을 스케줄링
+# job_url : location + article의 url
+# job_info : article의 정보 (article + link)
 # test용 time
-scheduler.add_job(JobController.urlTask, 'cron', hour=22, minute=51, id="job_url")
-scheduler.add_job(JobController.infoTask, 'cron', hour=23, minute=5, id="job_info")
+scheduler.add_job(JobController.urlTask, 'cron', hour=18, minute=20, id="job_url")
+scheduler.add_job(JobController.infoTask, 'cron', hour=18, minute=23, id="job_info")
 
 scheduler.start()
 

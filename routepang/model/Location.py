@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.gis.db import models as models_gis
-from datetime import datetime
 
 class Location(models.Model):
     class Meta:
@@ -16,8 +15,8 @@ class Location(models.Model):
     # api에서 제공 X
     # used_time = models.FloatField(default=0, blank=False) # doulbe??
     image = models.CharField(max_length=1000, null=True, blank=False, default="no image")
-    reg_date = models.DateTimeField(null=True, blank=False, default=str(datetime.now())[:19])
-    update_date = models.DateTimeField(null=True, blank=False, default=str(datetime.now())[:19])
+    reg_date = models.DateTimeField(null=True, blank=False)
+    update_date = models.DateTimeField(null=True, blank=False)
 
     # 튜플의 대표값
     def __str__(self):

@@ -78,11 +78,11 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'routepang',
-        'USER': 'root',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'gisdb',
+        'USER': 'itaewon',
+        'PASSWORD': 'swmaestro',
+        'HOST': 'gisdb.czmzrlit7axe.ap-northeast-2.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
 

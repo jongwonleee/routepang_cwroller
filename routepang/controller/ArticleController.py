@@ -56,10 +56,10 @@ class ArticleController:
         # 이미 링크 테이블에 있는 경우
         if not Link.objects.filter(link_url=request[2]).exists():
             Link(link_url=request[2], favicon_url=request[4], image_url=request[1], summary=request[0]
-                 , reg_date=request[3]).save()
+                 , reg_date=request[3], update_date=str(datetime.now())[:19]).save()
             existedLink = Link.objects.get(link_url=request[2])
             Article(location_id=locaion_id, link_id=existedLink.id, image=request[1], summary=request[0]
-                    , reg_date=request[3]).save()
+                    , reg_date=request[3], update_date=str(datetime.now())[:19]).save()
         else:
             # 기존의 article은 update_date를 now로 업데이트
             existedLink = Link.objects.get(link_url=request[2])

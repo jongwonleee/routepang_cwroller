@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import datetime
 
 class Link(models.Model):
     class Meta:
@@ -10,8 +9,8 @@ class Link(models.Model):
     favicon_url = models.CharField(max_length=1000, null=True, blank=False)
     image_url = models.CharField(max_length=1000, null=True, blank=False)
     summary = models.CharField(max_length=500, null=True, blank=False)
-    reg_date = models.DateTimeField(null=True, blank=False, default=str(datetime.now())[:19])
-    update_date = models.DateTimeField(null=True, blank=False, default=str(datetime.now())[:19])
+    reg_date = models.DateTimeField(null=True, blank=False)
+    update_date = models.DateTimeField(null=True, blank=False)
 
     def __str__(self):
         return self.id

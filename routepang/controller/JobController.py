@@ -64,7 +64,7 @@ def infoTask():
             # 새로운 url만큼 urlList에 추가
             for new_url in current_urlList[len(urlList):current_urlList.count()]:
                 urlList.append(new_url)
-        time.sleep(1)
+        time.sleep(5)
 
     del article_controller
 

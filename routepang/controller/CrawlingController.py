@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from routepang.model.Link import Link
+from routepang.personal import personal
 
 class CrawlingController:
 
@@ -10,8 +11,9 @@ class CrawlingController:
     Driver_Dir = "/Users/cy/PycharmProjects/chromedriver"
 
     def __init__(self):
-        self.usrId = "an20171@naver.com"
-        self.pwd = "Adhlee00!@!@"
+        # instagram 계정 (개인)
+        self.usrId = personal.usrId
+        self.pwd = personal.password
 
         self.driver = webdriver.Chrome(self.Driver_Dir)
         self.driver.implicitly_wait(10)
@@ -42,18 +44,18 @@ class CrawlingController:
         url_list = []
         link_url = []
 
+        self.driver.find_element_by_xpath("//input[@placeholder='검색']").clear()
         elem = self.driver.find_element_by_xpath("//input[@placeholder='검색']")
         # location_name으로 검색창에 검색
         # name에 태그에 들어가면 안되는 문자도 사용 가능
         elem.send_keys(request)
 
-        time.sleep(1)
+        time.sleep(2)
         # 검색 결과 맨 위를 클릭
         try:
             self.driver.find_element_by_css_selector('div.fuqBx > a').click()
         # 검색 결과가 없는 경우 체크
         except NoSuchElementException:
-            self.driver.find_element_by_xpath("//input[@placeholder='검색']").clear()
             return url_list
         # 검색한 페이지가 로딩될 때 까지 대기
         time.sleep(5)
