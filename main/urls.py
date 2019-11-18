@@ -25,8 +25,8 @@ scheduler = BackgroundScheduler()
 # job_url : location + article의 url
 # job_info : article의 정보 (article + link)
 # test용 time
-scheduler.add_job(JobController.urlTask, 'cron', hour=18, minute=20, id="job_url")
-scheduler.add_job(JobController.infoTask, 'cron', hour=18, minute=23, id="job_info")
+scheduler.add_job(JobController.urlTask, 'cron', hour=15, minute=10, id="job_url")
+scheduler.add_job(JobController.infoTask, 'cron', hour=17, minute=30, id="job_info")
 
 scheduler.start()
 

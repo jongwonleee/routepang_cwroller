@@ -12,8 +12,9 @@ class CrawlingController:
 
     def __init__(self):
         # instagram 계정 (개인)
-        self.usrId = personal.usrId
-        self.pwd = personal.password
+        identify = personal()
+        self.usrId = identify.getUsrId()
+        self.pwd = identify.getPassword()
 
         self.driver = webdriver.Chrome(self.Driver_Dir)
         self.driver.implicitly_wait(10)
@@ -58,7 +59,7 @@ class CrawlingController:
         except NoSuchElementException:
             return url_list
         # 검색한 페이지가 로딩될 때 까지 대기
-        time.sleep(5)
+        time.sleep(4)
 
         # select page type
         cur_url = str(self.driver.current_url).split('/')
@@ -83,26 +84,22 @@ class CrawlingController:
             # Search by Tag
             if urlType == "tags":
                 article_url = self.driver.find_elements_by_css_selector('article.KC1QD > div > div > div > div > a')
-                for i in article_url:
-                    link_url.append(i)
+                link_url = link_url + article_url
                 # Not enough Recent Article
                 # 인기 게시물까지 추가하고 리턴
-                if len(article_url) < 12:
+                if len(article_url) < 20:
                     popular_link = self.driver.find_elements_by_css_selector('article.KC1QD > div.EZdmt > div > div > div > div > a')
-                    for link in popular_link:
-                        article_url.append(link)
+                    article_url = article_url + popular_link
                     url_list = self.getArticleUrl(article_url)
                     return url_list
             # Search by Location
             elif urlType == "locations":
                 article_url = self.driver.find_elements_by_css_selector('article.vY_QD > div > div > div > div > a')
-                for i in article_url:
-                    link_url.append(i)
+                link_url = link_url + article_url
             # Search by Page
             elif urlType == "page":
                 article_url = self.driver.find_elements_by_css_selector('article.FyNDV > div > div > div > div > a')
-                for i in article_url:
-                    link_url.append(i)
+                link_url = link_url + article_url
 
             # 게시물이 없으면
             if len(link_url) == 0:
@@ -122,8 +119,8 @@ class CrawlingController:
         print(time.time(), 'elapsed time:', time.time() - t)
 
         # url_list중에서 앞에 10개만 return
-        if len(url_list) > 5:
-            return url_list[:5]
+        if len(url_list) > 20:
+            return url_list[:20]
         else:
             return url_list
 

@@ -51,8 +51,7 @@ class ArticleController:
 
         print(time.time(), 'start insert')
 
-        #TODO 수정 바람
-        # 중복검사(url) 추가
+        # 중복검사(url)
         # 이미 링크 테이블에 있는 경우
         if not Link.objects.filter(link_url=request[2]).exists():
             Link(link_url=request[2], favicon_url=request[4], image_url=request[1], summary=request[0]

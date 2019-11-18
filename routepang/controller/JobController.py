@@ -11,7 +11,7 @@ import time
 
 def urlTask():
 
-    print("Crawling start at: " + str(datetime.now()))
+    print("urlTask start at: " + str(datetime.now()))
 
     # -------- ( Add Location ) -------- #
     location_controller = LocationController()
@@ -33,20 +33,23 @@ def urlTask():
         place = str(location.name)
         urlList = crawling_controller.getAllArticle(request=place)
 
-        # 10개 이하의 데이터만 가져와서 저장
-
-        for url in urlList:
-            url_controller.insertUrl(request=url, location_id=location.id)
+        # 20개 이하의 데이터만 가져와서 저장
+        if len(urlList) > 0:
+            for url in urlList:
+                url_controller.insertUrl(request=url, location_id=location.id)
 
     del crawling_controller
-    # del location_controller
+    del location_controller
     del url_controller
+
+    print("urlTask end at: " + str(datetime.now()))
 
     return
 
 
 def infoTask():
 
+    print("infoTask start at: " + str(datetime.now()))
     # append를 사용하기 위한 list 선언
     urlList = []
     article_controller = ArticleController()
@@ -64,8 +67,12 @@ def infoTask():
             # 새로운 url만큼 urlList에 추가
             for new_url in current_urlList[len(urlList):current_urlList.count()]:
                 urlList.append(new_url)
-        time.sleep(5)
+        time.sleep(1)
 
     del article_controller
+    # 크롤링 후 임시 저장 url 모두 delete
+    Url.objects.all().delete()
+
+    print("infoTask end at: " + str(datetime.now()))
 
     return

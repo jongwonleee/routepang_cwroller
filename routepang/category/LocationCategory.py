@@ -157,6 +157,7 @@ class LocationCategory:
             "subpremise" : 0,
         }
 
+    # 구글의 카테고리를 루팡의 카테고리로 변경
     def getCategoryNo(self, request):
         category_num = self.category[request]
 

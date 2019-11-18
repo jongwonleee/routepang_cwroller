@@ -2,6 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 from datetime import datetime
+import time
 
 from django.contrib.gis.geos import GEOSGeometry
 from routepang.model.Location import Location
@@ -14,7 +15,8 @@ from routepang.personal import personal
 class LocationController:
 
     def __init__(self):
-        self.google_api_key = personal.mapKey
+        identify = personal()
+        self.google_api_key = identify.getMapkey()
         self.category = ["attraction", "food", "museum", "grocery", "subwaystation", "church", "hospital", "police"
                          , "lodging", "theater", "bank", "spa"]
 
@@ -23,33 +25,34 @@ class LocationController:
 
         for category in self.category:
             location_list = []
+            next_page_token = ""
 
-            # attraction / food / cafe 정도로 category를 나눌 예정
-            request_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + request + "+" + \
-                            category + "&key=" + self.google_api_key + "&language=ko"
+            for i in range(3):
+                request_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + request + "+" + \
+                                    category + "&key=" + self.google_api_key + "&pagetoken=" + next_page_token + "&language=ko"
 
-            req = requests.get(request_url)
-            html = req.text
-            soup = BeautifulSoup(html, 'html.parser')
+                req = requests.get(request_url)
+                html = req.text
+                soup = BeautifulSoup(html, 'html.parser')
 
-            # json 형태로 데이터 정제
-            json_data = json.loads(str(soup))
-            json_loaction_result = json_data["results"]
+                # json 형태로 데이터 정제
+                json_data = json.loads(str(soup))
+                json_loaction_result = json_data["results"]
 
-            location_list = location_list + json_loaction_result
+                location_list = location_list + json_loaction_result
 
-            # try:
-            #     next_page_token = json_data["next_page_token"]
-            #     # 마지막 페이지에서는
-            #     # next_page_token 키가 없기 때문에
-            #     # 키에러가 발생
-            # except KeyError:
-            #     next_page_token = "END"
-            #
-            # if next_page_token == "END":
-            #     break
-            # else:
-            #         time.sleep(2)
+                try:
+                    next_page_token = json_data["next_page_token"]
+                    # 마지막 페이지에서는
+                    # next_page_token 키가 없기 때문에
+                    # 키에러가 발생
+                except KeyError:
+                    next_page_token = "END"
+
+                if next_page_token == "END":
+                    break
+                else:
+                        time.sleep(3)
 
             self.insertLocation(request=location_list)
 
@@ -101,8 +104,6 @@ class LocationController:
                     # 메인 카테고리에 속하지 않으면 0(UNKNOWN) 처리
                     except KeyError:
                         category = 0
-
-                # print(name, "->", types, "->", category)
 
                 # 카테고리 인스턴스 생성
                 # TODO 카테고리에 알맞은 category_number값 추가
